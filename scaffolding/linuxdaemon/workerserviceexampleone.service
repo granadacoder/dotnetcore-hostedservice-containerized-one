@@ -1,0 +1,12 @@
+[Unit]
+Description=WorkerServiceExampleOne Linux Daemon
+
+[Service]
+Type=notify
+WorkingDirectory=/SomeDirectory
+ExecStart=/SomeDirectory/MyCompany.MyExamples.WorkerServiceExampleOne.ConsoleOne
+Restart=always
+Environment="ASPNETCORE_ENVIRONMENT=Development"
+
+[Install]
+WantedBy=multi-user.target

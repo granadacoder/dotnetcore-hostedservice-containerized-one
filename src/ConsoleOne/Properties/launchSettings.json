@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MyCompany.MyExamples.WorkerServiceExampleOne.ConsoleOne": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
