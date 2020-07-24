@@ -1,0 +1,34 @@
+# See https://hub.docker.com/_/microsoft-dotnet-core-sdk/
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS buildImage
+WORKDIR /mybuilddir
+
+
+# Copy sln and csprojs and restore as distinct layers
+COPY ./src/Solutions/MyCompany.MyExamples.WorkerServiceExampleOne.sln ./src/Solutions/
+
+COPY ./src/BusinessLayer/*.csproj ./src/BusinessLayer/
+COPY ./src/ConsoleOne/*.csproj ./src/ConsoleOne/
+COPY ./src/DataLayer.EntityFramework/*.csproj ./src/DataLayer.EntityFramework/
+COPY ./src/DataLayer.Interfaces/*.csproj ./src/DataLayer.Interfaces/
+COPY ./src/Domain/*.csproj ./src/Domain/
+
+
+RUN dotnet restore ./src/Solutions/MyCompany.MyExamples.WorkerServiceExampleOne.sln
+
+COPY ./src ./src
+
+RUN dotnet publish "./src/ConsoleOne/MyCompany.MyExamples.WorkerServiceExampleOne.ConsoleOne.csproj" -c Release -o myOut -r linux-x64 /p:PublishSingleFile=true /p:DebugType=None  --framework netcoreapp3.1
+
+
+COPY ./scaffolding/linuxdaemon/workerserviceexampleone.service ./scaffolding/linuxdaemon/
+
+
+# See https://hub.docker.com/_/microsoft-dotnet-core-runtime/
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
+WORKDIR /myrundir
+COPY --from=buildImage /mybuilddir/myOut ./
+
+
+
+
+ENTRYPOINT ["/myrundir/MyCompany.MyExamples.WorkerServiceExampleOne.ConsoleOne"]
